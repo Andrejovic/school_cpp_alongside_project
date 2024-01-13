@@ -15,5 +15,6 @@ int main()
     cv::moveWindow("Loving cpp", 0, 45);
     cv::waitKey(0);
     cv::destroyAllWindows();
+    std::cout << "Hello";
     return 0;
 }
