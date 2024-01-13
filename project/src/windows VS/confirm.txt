@@ -1,0 +1,1 @@
+adding windows technological demo using visual studio and it's defual compiler
