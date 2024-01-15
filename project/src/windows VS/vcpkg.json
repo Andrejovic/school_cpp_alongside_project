@@ -1,0 +1,9 @@
+{
+    "name" : "TechnologicDemo",
+    "version-string" : "1.0.0",
+    "builtin-baseline" : "53bef8994c541b6561884a8395ea35715ece75db",
+    "dependencies" : [ {
+      "name" : "opencv4",
+      "version>=" : "4.8.0#14"
+    } ]
+}
