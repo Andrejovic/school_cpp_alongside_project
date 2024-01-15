@@ -11,6 +11,7 @@ https://opencv.org/releases/
 - Install vcpkg
     - Linux:
         - in /src ```vcpkg install```
+        - CHANGE THE PATH IN CMAKE TO YOUR INSTALLATION PATH
 
 vcpkg.json has the necessary info about library
 
