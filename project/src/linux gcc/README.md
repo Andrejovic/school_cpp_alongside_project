@@ -1,3 +1,10 @@
 ## OpenCV installation tutorial
 
-https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html
+Install vcpkg
+    Windows developer console:
+        vcpkg integrate install
+        in /src vcpkg install
+    Linux:
+        in /src vcpkg install
+
+(CLion automatically has vcpkg plugin, it's easy to use the gui to install opencv4)
