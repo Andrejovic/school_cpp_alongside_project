@@ -6,12 +6,12 @@ https://opencv.org/releases/
 
 ## OpenCV installation tutorial
 
-Install vcpkg
+- Install vcpkg
     - Windows developer console:
-        ```vcpkg integrate install```
-        in /src ```vcpkg install```
+        - ```vcpkg integrate install```
+        - in /src ```vcpkg install```
     - Linux:
-        in /src ```vcpkg install```
+        - in /src ```vcpkg install```
 
 vcpkg.json has the necessary info about library
 
