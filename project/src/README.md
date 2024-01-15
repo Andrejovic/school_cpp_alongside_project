@@ -4,7 +4,15 @@ Project needs OpenCV to function.
 https://opencv.org/releases/
 
 
+## OpenCV installation tutorial
 
-## Project source files
+Install vcpkg
+    - Windows developer console:
+        ```vcpkg integrate install```
+        in /src ```vcpkg install```
+    - Linux:
+        in /src ```vcpkg install```
 
-Put your main project files (`CMakeLists.txt`, `.vcxproj` etc.) here. Put your source files here or in subdirectories.
+vcpkg.json has the necessary info about library
+
+(CLion automatically has vcpkg plugin, it's easy to use the gui to install opencv4)

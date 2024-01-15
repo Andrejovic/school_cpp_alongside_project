@@ -1,7 +1,18 @@
+## Dependencies
+
+Project needs OpenCV to function.
+https://opencv.org/releases/
+
+
 ## OpenCV installation tutorial
 
-https://docs.opencv.org/4.x/d3/d52/tutorial_windows_install.html
+Install vcpkg
+    - Windows developer console:
+        ```vcpkg integrate install```
+        in /src ```vcpkg install```
+    - Linux:
+        in /src ```vcpkg install```
 
-## the one i used
+vcpkg.json has the necessary info about library
 
-https://www.youtube.com/watch?v=unSce_GPwto
+(CLion automatically has vcpkg plugin, it's easy to use the gui to install opencv4)
