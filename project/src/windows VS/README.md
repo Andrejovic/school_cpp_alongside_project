@@ -6,7 +6,7 @@ https://opencv.org/releases/
 
 ## OpenCV installation tutorial
 
-Install vcpkg
+- Install vcpkg
     - Windows developer console:
         - ```vcpkg integrate install```
         - in /src ```vcpkg install```
