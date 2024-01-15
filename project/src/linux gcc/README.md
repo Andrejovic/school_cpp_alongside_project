@@ -1,5 +1,7 @@
 ## Dependencies
 
+git
+
 Project needs OpenCV to function.
 https://opencv.org/releases/
 
@@ -7,9 +9,6 @@ https://opencv.org/releases/
 ## OpenCV installation tutorial
 
 - Install vcpkg
-    - Windows developer console:
-        - ```vcpkg integrate install```
-        - in /src ```vcpkg install```
     - Linux:
         - in /src ```vcpkg install```
 
