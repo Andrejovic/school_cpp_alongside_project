@@ -1,4 +1,4 @@
-// TechnologicDemo.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// TechDemon.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <opencv2/core.hpp>
