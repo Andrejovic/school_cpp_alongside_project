@@ -25,15 +25,9 @@ vector<string> camera::start_scanning(string path_to_out) {
             }
             else {
                 frame = imread("testimg2.jpg");
-                imshow("test", frame);
-                waitKey(0);
                 myocr frame_text_recognition;
-                Mat box;
                 Mat processedFrame;
-                box = frame_text_recognition.box_detection(frame);
-                cv::imshow("frame", box);
-                cv::waitKey(0);
-                frame = frame_text_recognition.fix_perspective(frame, box); //TODO
+                frame = frame_text_recognition.box_detection(frame);
                 cv::imshow("frame", frame);
                 cv::waitKey(0);
                 processedFrame = frame_text_recognition.image_processing(frame);

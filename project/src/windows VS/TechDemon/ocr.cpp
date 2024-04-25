@@ -4,99 +4,80 @@
 using namespace cv;
 using namespace std;
 
-vector<Vec2f> sort_points(Mat pts) {
-    vector<Vec2f> ret(4);
-    vector<float> sumF(pts.rows);
-    vector<float> diffF(pts.rows);
-
-    for (int i = 0; i < pts.rows; i++) {
-
-        Point2f point;
-        Point2f pointOld;
-        
-        Vec2f pointVec = pts.at<float>(i);
-        point = Point2f(pointVec[0], pointVec[1]);
-
-        Vec2f pointVecOld;
-        if (i > 0) {
-            Vec2f pointVecOld = pts.at<float>(i - 1);
-            pointOld = Point2f(pointVecOld[0], pointVecOld[1]);
-        }
-        
-        sumF[i] = point.x + point.y;
-        diffF[i] = (i > 0) ? point.x - pointOld.x : 0;
-    }
-
-    int minSumIdx = min_element(sumF.begin(), sumF.end()) - sumF.begin();
-    int minDiffIdx = min_element(diffF.begin(), diffF.end()) - diffF.begin();
-    int maxSumIdx = max_element(sumF.begin(), sumF.end()) - sumF.begin();
-    int maxDiffIdx = max_element(diffF.begin(), diffF.end()) - diffF.begin();
-
-    ret[0] = pts.at<float>(minSumIdx);
-    ret[1] = pts.at<float>(minDiffIdx);
-    ret[2] = pts.at<float>(maxSumIdx);
-    ret[3] = pts.at<float>(maxDiffIdx);
-    return ret;
-}
-
-float max_distance(Point2f a1, Point2f a2, Point2f b1, Point2f b2) {
-    float dist1 = norm(a1 - a2);
-    float dist2 = norm(b1 - b2);
-
-    return dist2 < dist1 ? int(dist1) : int(dist2);
-}
-
-Mat myocr::box_detection(Mat frame) {
-    
+vector<Point> find_max_contour(Mat frame) {
+    Mat edges;
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
-    frame = image_processing(frame);
-    cv::findContours(frame, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+    cvtColor(frame, frame, COLOR_BGR2GRAY);
+    Canny(frame, edges, 40, 200, 3);
+    cv::findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+    Mat cont = Mat::zeros(frame.size(), CV_8UC3);
     size_t max = 0;
     for (size_t i = 0; i < contours.size(); i++) {
         if (contourArea(contours[max]) < contourArea(contours[i])) {
             max = i;
         }
-        drawContours(frame, contours, (int)i, Scalar(255), 1, LINE_8, hierarchy, 0);
+        drawContours(cont, contours, (int)i, Scalar(255), 1, LINE_8, hierarchy, 0);
     }
-    cv::imshow("frame", contours);
+    Mat cont_max = Mat::zeros(frame.size(), CV_8UC3);
+    drawContours(cont_max, contours, (int)max, Scalar(255));
+    return contours[max];
+}
+ 
+Mat myocr::box_detection(Mat frame) {
+    vector<Point> contour = find_max_contour(frame);
+
+    Mat img = Mat::zeros(frame.size(), CV_8UC3);
+    
+
+    vector<vector<Point>> contour_list = { contour };
+    drawContours(frame, contour_list, 0, Scalar(255, 255, 255), 2);
+    cv::imshow("Contours", frame);
     cv::waitKey(0);
-    RotatedRect rect = minAreaRect(contours[max]);
+    RotatedRect rect = minAreaRect(contour);
     Mat box;
     boxPoints(rect, box);
-    return box;
+
+    float angle = rect.angle;
+    if (angle < 90.0) {
+        angle -= 90.0;
+    }
+    Mat rotMatrix = getRotationMatrix2D(rect.center, angle, 1.0);
+
+    vector<Point2f> points;
+    for (int i = 0; i < box.rows; i++) {
+        Point2f point(box.at<float>(i, 0), box.at<float>(i, 1));
+        points.push_back(point);
+    }
+
+    
+
+    Mat mask = Mat::zeros(frame.size(), CV_8U);
+    Mat cropped;
+    drawContours(mask, contour_list, 0, Scalar(255), FILLED);
+    frame.copyTo(cropped, mask);
+    warpAffine(cropped, frame, rotMatrix, cropped.size());
+
+    contour = find_max_contour(frame);
+    Rect bounding = boundingRect(contour);
+
+    frame = frame(Range(bounding.y, bounding.y + bounding.height),
+                  Range(bounding.x, bounding.x + bounding.width));
+    cv::imshow("Contours", frame);
+    cv::waitKey(0);
+    return frame;
 }
 
 Mat myocr::image_processing(Mat frame) {
     Mat grayFrame;
     cv::cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
-    /*imshow("frame", grayFrame);
-    cv::waitKey(0);*/
     cv::GaussianBlur(grayFrame, grayFrame, Size(1, 1), 1000);
-    /*imshow("frame", grayFrame);
-    cv::waitKey(0);*/
-    cv::threshold(grayFrame, grayFrame, 100, 255, THRESH_BINARY);
-    /*imshow("frame", grayFrame);
-    cv::waitKey(0);*/
+    cv::threshold(grayFrame, grayFrame, 75, 200, THRESH_BINARY);
     return grayFrame;
 }
 
 Mat myocr::fix_perspective(Mat frame, Mat pts) {
-    vector<Vec2f> sortedPts = sort_points(pts);
-    Vec2f tl = sortedPts[0];
-    Vec2f tr = sortedPts[1];
-    Vec2f br = sortedPts[2];
-    Vec2f bl = sortedPts[3];
-
-    float maxW = max_distance(br, bl, tr, tl);
-    float maxH = max_distance(tr, br, tl, bl);
-
-    vector<Point2f> dst = { Point2f(0, 0), Point2f(maxW - 1, 0), Point2f(maxW - 1, maxH - 1), Point2f(0, maxH - 1) };
-
-    Mat transform = getPerspectiveTransform(vector<Point2f>{tl, tr, br, bl}, dst);
-    Mat fixed = Mat::zeros(Size(maxW, maxH), frame.type());
-    warpPerspective(frame, fixed, transform, fixed.size());
-
+    Mat fixed;
     return fixed;
 }
 
