@@ -2,7 +2,7 @@
 
 git
 
-Project needs OpenCV and Tesseract to function.
+Project needs OpenCV, Tesseract and LibcURL to function.
 https://opencv.org/releases/
 
 
@@ -17,6 +17,7 @@ https://opencv.org/releases/
     - ```.\vcpkg integrate install```
     - ```.\vcpkg install opencv4``` (if doesnt work, search for it first with ```.\vcpkg search opencv4```)
     - ```.\vcpkg install tesseract```
+    - ```.\vcpkg install curl```
     - done, now every MSBuild C++ project should have access to OpenCV
 
 

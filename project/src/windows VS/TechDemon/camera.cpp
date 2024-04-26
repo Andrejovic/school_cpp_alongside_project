@@ -6,7 +6,7 @@ using namespace std;
 vector<string> camera::start_scanning(string path_to_out) {
     vector<string> scanned_cards;
     VideoCapture cap = start_camera();
-    ofstream outfile(path_to_out);
+    ofstream outfile;
     string outText;
     
     tesseract::TessBaseAPI* ocr = new tesseract::TessBaseAPI();
@@ -14,6 +14,7 @@ vector<string> camera::start_scanning(string path_to_out) {
 
     bool scanning = true;
     while (scanning) {
+        outfile.open(path_to_out); //closes after each scan for loss of data
         Mat frame;
         namedWindow("camera", WINDOW_AUTOSIZE);
         cap.read(frame);
@@ -27,10 +28,11 @@ vector<string> camera::start_scanning(string path_to_out) {
                 frame = imread("testimg2.jpg");
                 myocr frame_text_recognition;
                 Mat processedFrame;
-                frame = frame_text_recognition.box_detection(frame);
-                cv::imshow("frame", frame);
-                cv::waitKey(0);
+                frame = frame_text_recognition.upright_box_detection(frame);
                 processedFrame = frame_text_recognition.image_processing(frame);
+
+
+
 
                 cv::imshow("frame", processedFrame);
                 cv::waitKey(0);

@@ -4,7 +4,7 @@
 using namespace cv;
 using namespace std;
 
-vector<Point> find_max_contour(Mat frame) {
+vector<Point> myocr::find_max_contour(Mat frame) {
     Mat edges;
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -24,46 +24,12 @@ vector<Point> find_max_contour(Mat frame) {
     return contours[max];
 }
  
-Mat myocr::box_detection(Mat frame) {
+Mat myocr::upright_box_detection(Mat frame) {
     vector<Point> contour = find_max_contour(frame);
-
-    Mat img = Mat::zeros(frame.size(), CV_8UC3);
-    
-
-    vector<vector<Point>> contour_list = { contour };
-    drawContours(frame, contour_list, 0, Scalar(255, 255, 255), 2);
-    cv::imshow("Contours", frame);
+    cv::imshow("after_find_max_contour", frame);
     cv::waitKey(0);
-    RotatedRect rect = minAreaRect(contour);
-    Mat box;
-    boxPoints(rect, box);
-
-    float angle = rect.angle;
-    if (angle < 90.0) {
-        angle -= 90.0;
-    }
-    Mat rotMatrix = getRotationMatrix2D(rect.center, angle, 1.0);
-
-    vector<Point2f> points;
-    for (int i = 0; i < box.rows; i++) {
-        Point2f point(box.at<float>(i, 0), box.at<float>(i, 1));
-        points.push_back(point);
-    }
-
-    
-
-    Mat mask = Mat::zeros(frame.size(), CV_8U);
-    Mat cropped;
-    drawContours(mask, contour_list, 0, Scalar(255), FILLED);
-    frame.copyTo(cropped, mask);
-    warpAffine(cropped, frame, rotMatrix, cropped.size());
-
-    contour = find_max_contour(frame);
-    Rect bounding = boundingRect(contour);
-
-    frame = frame(Range(bounding.y, bounding.y + bounding.height),
-                  Range(bounding.x, bounding.x + bounding.width));
-    cv::imshow("Contours", frame);
+    frame = this->fix_perspective(frame, contour);
+    cv::imshow("after_fix_perspective", frame);
     cv::waitKey(0);
     return frame;
 }
@@ -76,8 +42,40 @@ Mat myocr::image_processing(Mat frame) {
     return grayFrame;
 }
 
-Mat myocr::fix_perspective(Mat frame, Mat pts) {
-    Mat fixed;
-    return fixed;
+Mat myocr::rotate_image(Mat frame, vector<Point> contour){
+    RotatedRect rect = minAreaRect(contour);
+    Mat box;
+    boxPoints(rect, box);
+
+    float angle = rect.angle;
+    if (angle < 90.0 && angle > 0) { //TODO
+        angle -= 90.0;
+    }
+    Mat rotMatrix = getRotationMatrix2D(rect.center, angle, 1.0);
+
+    vector<Point2f> points;
+    for (int i = 0; i < box.rows; i++) {
+        Point2f point(box.at<float>(i, 0), box.at<float>(i, 1));
+        points.push_back(point);
+    }
+    warpAffine(frame, frame, rotMatrix, frame.size());
+
+    return frame;
+}
+Mat myocr::crop_image(Mat frame) {
+    vector<Point> contour = find_max_contour(frame);
+    Rect bounding = boundingRect(contour);
+
+    frame = frame(Range(bounding.y, bounding.y + bounding.height),
+        Range(bounding.x, bounding.x + bounding.width));
+    return frame;
 }
 
+Mat myocr::fix_perspective(Mat frame, vector<Point> contour) {
+    vector<vector<Point>> contour_list = { contour };
+    drawContours(frame, contour_list, 0, Scalar(255, 255, 255), 2);
+
+    frame = rotate_image(frame, contour);
+    frame = crop_image(frame);
+    return frame;
+}
