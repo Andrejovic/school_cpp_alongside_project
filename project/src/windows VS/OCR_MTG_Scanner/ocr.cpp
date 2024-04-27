@@ -4,12 +4,23 @@
 using namespace cv;
 using namespace std;
 
+//this method finds the largest contour of a given image by area
 vector<Point> myocr::find_max_contour(Mat frame) {
     Mat edges;
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
+    
     cvtColor(frame, frame, COLOR_BGR2GRAY);
-    Canny(frame, edges, 40, 200, 3);
+    blur(frame, frame, Size(3, 3));
+
+    cv::Mat sorted;
+    cv::sort(frame, sorted, SORT_EVERY_COLUMN + SORT_EVERY_ROW);
+    double median;
+	median = sorted.at<uchar>(sorted.total() / 2);
+    double sigma = 0.1;
+	double lower = std::max(0.0, (1.0 - sigma) * median);
+	double upper = std::min(255.0, (1.0 + sigma) * median); // take a look at if this helps
+    Canny(frame, edges, 10, 100, 3);
     cv::findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
     Mat cont = Mat::zeros(frame.size(), CV_8UC3);
     size_t max = 0;
@@ -24,31 +35,30 @@ vector<Point> myocr::find_max_contour(Mat frame) {
     return contours[max];
 }
  
+//parent function, doesnt do anything by itself
 Mat myocr::upright_box_detection(Mat frame) {
     vector<Point> contour = find_max_contour(frame);
-    cv::imshow("after_find_max_contour", frame);
-    cv::waitKey(0);
     frame = this->fix_perspective(frame, contour);
-    cv::imshow("after_fix_perspective", frame);
-    cv::waitKey(0);
     return frame;
 }
 
+//self-explanatory
 Mat myocr::image_processing(Mat frame) {
     Mat grayFrame;
     cv::cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
-    cv::GaussianBlur(grayFrame, grayFrame, Size(1, 1), 1000);
-    cv::threshold(grayFrame, grayFrame, 75, 200, THRESH_BINARY);
+    cv::GaussianBlur(grayFrame, grayFrame, Size(3, 3), 1000);
+    cv::threshold(grayFrame, grayFrame, 120, 200, THRESH_BINARY);
     return grayFrame;
 }
 
+//rotate image according to the angle of the contour
 Mat myocr::rotate_image(Mat frame, vector<Point> contour){
     RotatedRect rect = minAreaRect(contour);
     Mat box;
     boxPoints(rect, box);
 
     float angle = rect.angle;
-    if (angle < 90.0 && angle > 0) { //TODO
+    if (angle < 90.0 && angle > 45) { // working fine, if the image scanned is semi-upright (until about 30 degrees either way)
         angle -= 90.0;
     }
     Mat rotMatrix = getRotationMatrix2D(rect.center, angle, 1.0);
@@ -62,6 +72,8 @@ Mat myocr::rotate_image(Mat frame, vector<Point> contour){
 
     return frame;
 }
+
+//crops image to the area of the rotated contour
 Mat myocr::crop_image(Mat frame) {
     vector<Point> contour = find_max_contour(frame);
     Rect bounding = boundingRect(contour);
@@ -71,6 +83,7 @@ Mat myocr::crop_image(Mat frame) {
     return frame;
 }
 
+//parent function, gets contour
 Mat myocr::fix_perspective(Mat frame, vector<Point> contour) {
     vector<vector<Point>> contour_list = { contour };
     drawContours(frame, contour_list, 0, Scalar(255, 255, 255), 2);

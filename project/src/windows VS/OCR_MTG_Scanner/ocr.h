@@ -6,6 +6,7 @@
 #include <tuple>
 #include <utility>
 #include <vector>
+#include <algorithm>
 class myocr
 {
 public:
