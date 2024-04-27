@@ -3,7 +3,7 @@
 using namespace cv;
 using namespace std;
 
-vector<string> camera::start_scanning(string path_to_out) {
+vector<string> camera::start_scanning(string& path_to_out) {
     vector<string> scanned_cards;
     VideoCapture cap = start_camera();
     ofstream outfile;
@@ -27,22 +27,22 @@ vector<string> camera::start_scanning(string path_to_out) {
             }
             else {
                 outfile.open(path_to_out, ios::app); //closes after each scan for dataloss prevention
-                frame = imread("bestcase.png"); //testing with an image
+                frame = imread("notbestcase.png"); //testing with an image
                 myocr frame_text_recognition;
-                Mat processedFrame;
-                frame = frame_text_recognition.upright_box_detection(frame);
+                frame_text_recognition.upright_box_detection(frame);
                 cv::imshow("press R to rescan", frame);
 				char key = cv::waitKey(0);
                 if (key == 'r') { //rescan
                     continue;
                 }
 
-                processedFrame = frame_text_recognition.image_processing(frame);
+                frame_text_recognition.image_processing(frame);
 
-                processedFrame = processedFrame(Range(round(processedFrame.rows * 0.05), round(processedFrame.rows * 0.1)), 
-                                                Range(round(processedFrame.cols * 0.08), round(processedFrame.cols * 0.92)));
+                frame = frame(Range(round(frame.rows * 0.05), round(frame.rows * 0.1)), 
+                              Range(round(frame.cols * 0.08), round(frame.cols * 0.8)));
+
                 ocr->SetPageSegMode(tesseract::PSM_AUTO);
-                ocr->SetImage(processedFrame.data, processedFrame.cols, processedFrame.rows, 1, static_cast<int>(processedFrame.step));
+                ocr->SetImage(frame.data, frame.cols, frame.rows, 1, static_cast<int>(frame.step));
                 outText = string(ocr->GetUTF8Text());
                 if (outText != "") {
                     size_t pos = outText.find('\n');

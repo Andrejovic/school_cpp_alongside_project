@@ -12,9 +12,11 @@ int main()
     //Esc - exit
     camera cam;
     std::vector<std::string> scanned_cards;
-    scanned_cards = cam.start_scanning("card_names_only.txt");
+    std::string path_to_card_names_only = "card_names_only.txt";
+	std::string path_to_card_prices = "card_prices.txt";
+    scanned_cards = cam.start_scanning(path_to_card_names_only);
     card_db collection;
-    collection.add_to_collection(scanned_cards,"card_prices.txt");
+    collection.add_to_collection(scanned_cards,path_to_card_prices);
 
     //different for Linux and Windows
     system("start card_prices.txt");

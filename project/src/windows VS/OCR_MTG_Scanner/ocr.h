@@ -10,12 +10,11 @@
 class myocr
 {
 public:
-	cv::Mat upright_box_detection(cv::Mat frame);
-	cv::Mat image_processing(cv::Mat frame);
-	cv::Mat fix_perspective(cv::Mat frame, std::vector<cv::Point> contour);
+	void upright_box_detection(cv::Mat& frame);
+	void image_processing(cv::Mat& frame);
+	void fix_perspective(cv::Mat& frame, std::vector<cv::Point>& contour);
 private:
 	std::vector<cv::Point> find_max_contour(cv::Mat);
-	cv::Mat rotate_image(cv::Mat frame, std::vector<cv::Point> contour);
-	cv::Mat crop_image(cv::Mat frame);
+	void rotate_image(cv::Mat& frame, std::vector<cv::Point>& contour);
+	void crop_image(cv::Mat& frame);
 };
-

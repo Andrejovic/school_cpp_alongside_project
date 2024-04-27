@@ -5,7 +5,7 @@ using namespace cv;
 using namespace std;
 
 //this method finds the largest contour of a given image by area
-vector<Point> myocr::find_max_contour(Mat frame) {
+vector<Point> myocr::find_max_contour(Mat frame) { //by not being a reference i create a copy, i would have to make a copy either way
     Mat edges;
     vector<vector<Point>> contours;
     vector<Vec4i> hierarchy;
@@ -36,23 +36,20 @@ vector<Point> myocr::find_max_contour(Mat frame) {
 }
  
 //parent function, doesnt do anything by itself
-Mat myocr::upright_box_detection(Mat frame) {
+void myocr::upright_box_detection(Mat& frame) {
     vector<Point> contour = find_max_contour(frame);
-    frame = this->fix_perspective(frame, contour);
-    return frame;
+    this->fix_perspective(frame, contour);
 }
 
 //self-explanatory
-Mat myocr::image_processing(Mat frame) {
-    Mat grayFrame;
-    cv::cvtColor(frame, grayFrame, COLOR_BGR2GRAY);
-    cv::GaussianBlur(grayFrame, grayFrame, Size(3, 3), 1000);
-    cv::threshold(grayFrame, grayFrame, 120, 200, THRESH_BINARY);
-    return grayFrame;
+void myocr::image_processing(Mat& frame) {
+    cv::cvtColor(frame, frame, COLOR_BGR2GRAY);
+    cv::GaussianBlur(frame, frame, Size(3, 3), 1000);
+    cv::threshold(frame, frame, 130, 220, THRESH_BINARY);
 }
 
 //rotate image according to the angle of the contour
-Mat myocr::rotate_image(Mat frame, vector<Point> contour){
+void myocr::rotate_image(Mat& frame, vector<Point>& contour){
     RotatedRect rect = minAreaRect(contour);
     Mat box;
     boxPoints(rect, box);
@@ -69,26 +66,22 @@ Mat myocr::rotate_image(Mat frame, vector<Point> contour){
         points.push_back(point);
     }
     warpAffine(frame, frame, rotMatrix, frame.size());
-
-    return frame;
 }
 
 //crops image to the area of the rotated contour
-Mat myocr::crop_image(Mat frame) {
+void myocr::crop_image(Mat& frame) {
     vector<Point> contour = find_max_contour(frame);
     Rect bounding = boundingRect(contour);
 
     frame = frame(Range(bounding.y, bounding.y + bounding.height),
         Range(bounding.x, bounding.x + bounding.width));
-    return frame;
 }
 
 //parent function, gets contour
-Mat myocr::fix_perspective(Mat frame, vector<Point> contour) {
+void myocr::fix_perspective(Mat& frame, vector<Point>& contour) {
     vector<vector<Point>> contour_list = { contour };
     drawContours(frame, contour_list, 0, Scalar(255, 255, 255), 2);
 
-    frame = rotate_image(frame, contour);
-    frame = crop_image(frame);
-    return frame;
+    rotate_image(frame, contour);
+    crop_image(frame);
 }

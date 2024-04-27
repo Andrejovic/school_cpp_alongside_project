@@ -1,5 +1,4 @@
 #include "card_db.h"
-#include <ranges>
 
 using namespace std;
 
@@ -18,9 +17,11 @@ string string_tolower(string s) {
 }
 
 //method to add all cards to a file with prices
-void card_db::add_to_collection(vector<string> scanned_cards, string path_to_data) {
+void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_data) {
+	string price;
+	string name;
+	string price_db;
 	ofstream price_data(path_to_data, ios::app);
-	//price_data << noskipws;
 	CURL* curl = curl_easy_init();
 	CURLcode response;
 	float price_total = 0.0;
@@ -35,7 +36,6 @@ void card_db::add_to_collection(vector<string> scanned_cards, string path_to_dat
 	struct curl_slist* headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");
 	for (string card : scanned_cards) {
-		string original_card = card;
 
 		card = string_tolower(card);
 		size_t pos = 0;
@@ -43,7 +43,7 @@ void card_db::add_to_collection(vector<string> scanned_cards, string path_to_dat
 			card.replace(pos, 1, "%20");
 		}
 
-		string price_db = this->price_db += card;
+		price_db = this->price_db += card;
 		const char* url = (price_db).c_str();
 		
 		curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -55,10 +55,11 @@ void card_db::add_to_collection(vector<string> scanned_cards, string path_to_dat
 		if (response != CURLE_OK) {
 			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(response) << std::endl;
 		}
-		string price = price_from_data(response_data);
+		price = price_from_data(response_data);
+		name = name_from_data(response_data);
 		if (price != "NULL")
 			price_total += stof(price);
-		price_data << original_card << ": " << price << endl;
+		price_data << name << ": " << price << endl;
 		
 	}
 	curl_slist_free_all(headers);
@@ -95,3 +96,12 @@ string card_db::price_from_data(string& response_data) {
 	return prices_eur + " eur";
 }
 
+string card_db::name_from_data(string& response_data) {
+	size_t name_start = response_data.find("\"name\":");
+	if (name_start == string::npos) {
+		return "NULL";
+	}
+	size_t name_end = response_data.find("\"", name_start + 8);
+	string name = response_data.substr(name_start + 8, name_end - name_start - 8);
+	return name;
+}
