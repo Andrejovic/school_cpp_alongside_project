@@ -4,7 +4,8 @@ git
 
 Project needs OpenCV, Tesseract and LibcURL to function.
 https://opencv.org/releases/
-
+https://github.com/tesseract-ocr/tesseract
+https://curl.se/libcurl/
 
 ## Libraries installation tutorial
 
