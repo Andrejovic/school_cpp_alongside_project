@@ -13,13 +13,6 @@ vector<Point> myocr::find_max_contour(Mat frame) { //by not being a reference i 
     cvtColor(frame, frame, COLOR_BGR2GRAY);
     blur(frame, frame, Size(3, 3));
 
-    cv::Mat sorted;
-    cv::sort(frame, sorted, SORT_EVERY_COLUMN + SORT_EVERY_ROW);
-    double median;
-	median = sorted.at<uchar>(sorted.total() / 2);
-    double sigma = 0.1;
-	double lower = std::max(0.0, (1.0 - sigma) * median);
-	double upper = std::min(255.0, (1.0 + sigma) * median); // take a look at if this helps
     Canny(frame, edges, 10, 100, 3);
     cv::findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
     Mat cont = Mat::zeros(frame.size(), CV_8UC3);
@@ -45,6 +38,13 @@ void myocr::upright_box_detection(Mat& frame) {
 void myocr::image_processing(Mat& frame) {
     cv::cvtColor(frame, frame, COLOR_BGR2GRAY);
     cv::GaussianBlur(frame, frame, Size(3, 3), 1000);
+    //cv::Mat sorted;
+    /*cv::sort(frame, sorted, SORT_EVERY_COLUMN + SORT_EVERY_ROW);
+    double median;
+    median = sorted.at<uchar>(static_cast<int>(sorted.total()) / 2);
+    double sigma = 0.55;
+    double lower = std::max(0.0, (1.0 - sigma) * median);
+    double upper = std::min(255.0, (1.0 + sigma) * median); // take a look at if this helps */
     cv::threshold(frame, frame, 130, 220, THRESH_BINARY);
 }
 

@@ -10,17 +10,16 @@ size_t write_data(void* contents, size_t size, size_t nmemb, std::string* data) 
 }
 
 //put a card name to lowercase
-string string_tolower(string s) {
+void string_tolower(string& s) {
 	for (char& c : s)
 		c = tolower(c);
-	return s;
 }
 
 //method to add all cards to a file with prices
-void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_data) {
+void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_data, string& currency) {
 	string price;
 	string name;
-	string price_db;
+	string price_db_call;
 	ofstream price_data(path_to_data, ios::app);
 	CURL* curl = curl_easy_init();
 	CURLcode response;
@@ -37,14 +36,14 @@ void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_d
 	headers = curl_slist_append(headers, "Accept: application/json");
 	for (string card : scanned_cards) {
 
-		card = string_tolower(card);
+		string_tolower(card);
 		size_t pos = 0;
 		while ((pos = card.find(' ', pos)) != string::npos) {
 			card.replace(pos, 1, "%20");
 		}
 
-		price_db = this->price_db += card;
-		const char* url = (price_db).c_str();
+		price_db_call = this->price_db + card;
+		const char* url = (price_db_call).c_str();
 		
 		curl_easy_setopt(curl, CURLOPT_URL, url);
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -55,7 +54,7 @@ void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_d
 		if (response != CURLE_OK) {
 			std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(response) << std::endl;
 		}
-		price = price_from_data(response_data);
+		price = price_from_data(response_data, currency);
 		name = name_from_data(response_data);
 		if (price != "NULL")
 			price_total += stof(price);
@@ -68,7 +67,7 @@ void card_db::add_to_collection(vector<string>& scanned_cards, string& path_to_d
 	curl_easy_cleanup(curl);
 	curl_global_cleanup();
 	price_data << "------------------------------------------" << endl;
-	price_data << "Total: " << price_total << " eur" << endl;
+	price_data << "Total: " << price_total << " " << currency << endl;
 	price_data << "------------------------------------------" << endl;
 	price_data.close();
 }
@@ -81,19 +80,18 @@ string find_given_price(string prices_data_part, string currency) {
 	return price;
 }
 
-string card_db::price_from_data(string& response_data) {
+string card_db::price_from_data(string& response_data, string& currency) {
 	size_t prices_start = response_data.find("\"prices\":");
 	if (prices_start == string::npos) {
 		return "NULL";
 	}
 	size_t prices_end = response_data.find("}", prices_start);
 	string prices_data_part = response_data.substr(prices_start, prices_end - prices_start + 1);
-
-	string prices_usd = find_given_price(prices_data_part, "\"usd\":");
-	string prices_eur = find_given_price(prices_data_part, "\"eur\":");
-	//give chance to choose between usd and eur
-
-	return prices_eur + " eur";
+	if (currency == "eur" || currency == "usd") {
+		string prices = find_given_price(prices_data_part, "\"" + currency + "\":");
+		return (prices + " " + currency);
+	}
+	return "use eur or usd";
 }
 
 string card_db::name_from_data(string& response_data) {

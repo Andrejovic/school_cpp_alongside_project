@@ -1,9 +1,10 @@
 
 #include "camera.h"
 #include "card_db.h"
+#include "config.h"
 
 
-int main()
+int main(int argc, char** argv)
 {
     //put the card on a contrasting background (contrasting with black)
     //when scanning, limit the shadows of the camera to the card
@@ -12,11 +13,20 @@ int main()
     //Esc - exit
     camera cam;
     std::vector<std::string> scanned_cards;
-    std::string path_to_card_names_only = "card_names_only.txt";
-	std::string path_to_card_prices = "card_prices.txt";
-    scanned_cards = cam.start_scanning(path_to_card_names_only);
+    config_reader config("config.txt");
+    mode_options mode;
+
+    if (config.mode != "camera" && config.mode != "folder") {
+        std::cout << "Error: Invalid mode" << std::endl;
+        return -1;
+    }
+    else {
+        mode = config.mode == "folder" ? Folder : Camera;
+    }
+
+    scanned_cards = cam.start_scanning(config.path_to_card_names_only, mode, config.folder_of_images);
     card_db collection;
-    collection.add_to_collection(scanned_cards,path_to_card_prices);
+    collection.add_to_collection(scanned_cards,config.path_to_card_prices, config.currency);
 
     //different for Linux and Windows
     system("start card_prices.txt");

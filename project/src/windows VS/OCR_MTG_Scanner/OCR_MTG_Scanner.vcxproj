@@ -133,13 +133,18 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="card_db.cpp" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="ocr.cpp" />
     <ClCompile Include="OCR_MTG_Scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="card_db.h" />
+    <ClInclude Include="config.h" />
     <ClInclude Include="ocr.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="config.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
