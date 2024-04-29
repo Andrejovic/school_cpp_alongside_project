@@ -14,6 +14,8 @@ vector<Point> myocr::find_max_contour(Mat frame) { //by not being a reference i 
     blur(frame, frame, Size(3, 3));
 
     Canny(frame, edges, 10, 100, 3);
+    cv::imshow("canny", edges);
+    cv::waitKey(0);
     cv::findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
     Mat cont = Mat::zeros(frame.size(), CV_8UC3);
     size_t max = 0;
@@ -45,7 +47,7 @@ void myocr::image_processing(Mat& frame) {
     double sigma = 0.55;
     double lower = std::max(0.0, (1.0 - sigma) * median);
     double upper = std::min(255.0, (1.0 + sigma) * median); // take a look at if this helps */
-    cv::threshold(frame, frame, 130, 220, THRESH_BINARY);
+    cv::threshold(frame, frame, 120, 230, THRESH_BINARY);
 }
 
 //rotate image according to the angle of the contour

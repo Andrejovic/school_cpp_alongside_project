@@ -1,1 +1,0 @@
-adding linux technological demo using clion and gcc

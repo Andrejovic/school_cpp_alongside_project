@@ -59,8 +59,6 @@ vector<string> camera::start_scanning(string& path_to_out, mode_options& mode, s
                 }
 
                 frame_text_recognition.image_processing(frame);
-                cv::imshow("press R to rescan", frame);
-                cv::waitKey(0);
                 frame = frame(Range(static_cast<int>(frame.rows * 0.05), static_cast<int>(frame.rows * 0.1)),
                               Range(static_cast<int>(frame.cols * 0.08), static_cast<int>(frame.cols * 0.8)));
                 cv::imshow("press R to rescan", frame);
@@ -81,8 +79,8 @@ vector<string> camera::start_scanning(string& path_to_out, mode_options& mode, s
             outfile.close();
             
         }
-        if (scanning != false) {
-            scanning = getWindowProperty("camera", WND_PROP_VISIBLE) > 0;
+        if (scanning) {
+            //scanning = getWindowProperty("camera", WND_PROP_VISIBLE) > 0;
             if (mode == Folder) {
                 if (i < images_in_folder.size() - 1) {
 					i++;

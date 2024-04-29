@@ -29,6 +29,6 @@ int main(int argc, char** argv)
     collection.add_to_collection(scanned_cards,config.path_to_card_prices, config.currency);
 
     //different for Linux and Windows
-    system("start card_prices.txt");
+    system("xdg-open card_prices.txt");
     return 0;
 }
