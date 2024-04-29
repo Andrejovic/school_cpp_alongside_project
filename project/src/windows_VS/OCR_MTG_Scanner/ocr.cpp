@@ -38,8 +38,8 @@ void myocr::upright_box_detection(Mat& frame) {
 void myocr::image_processing(Mat& frame) {
     cv::cvtColor(frame, frame, COLOR_BGR2GRAY);
     cv::GaussianBlur(frame, frame, Size(3, 3), 1000);
-    //cv::Mat sorted;
-    /*cv::sort(frame, sorted, SORT_EVERY_COLUMN + SORT_EVERY_ROW);
+    /*cv::Mat sorted;
+    cv::sort(frame, sorted, SORT_EVERY_COLUMN + SORT_EVERY_ROW);
     double median;
     median = sorted.at<uchar>(static_cast<int>(sorted.total()) / 2);
     double sigma = 0.55;

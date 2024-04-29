@@ -80,7 +80,6 @@ vector<string> camera::start_scanning(string& path_to_out, mode_options& mode, s
             
         }
         if (scanning) {
-            //scanning = getWindowProperty("camera", WND_PROP_VISIBLE) > 0;
             if (mode == Folder) {
                 if (i < images_in_folder.size() - 1) {
 					i++;

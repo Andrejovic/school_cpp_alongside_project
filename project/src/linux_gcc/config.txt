@@ -2,4 +2,4 @@ path_to_card_names_only = card_names_only.txt
 path_to_card_prices = card_prices.txt
 currency = eur
 mode = folder
-folder_of_images = C:/Users/ajdro/Desktop/images
+folder_of_images = ../../images

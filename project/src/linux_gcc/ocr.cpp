@@ -47,7 +47,7 @@ void myocr::image_processing(Mat& frame) {
     double sigma = 0.55;
     double lower = std::max(0.0, (1.0 - sigma) * median);
     double upper = std::min(255.0, (1.0 + sigma) * median); // take a look at if this helps */
-    cv::threshold(frame, frame, 120, 230, THRESH_BINARY);
+    cv::threshold(frame, frame, 130, 220, THRESH_BINARY);
 }
 
 //rotate image according to the angle of the contour
