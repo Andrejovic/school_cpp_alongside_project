@@ -1,0 +1,20 @@
+Uživateľská Dokumentácia OCR MTG Scanner
+V config.txt je defaultná konfigurácia pre program.
+	- pathy sú konfigurovateľné na relatívnu pathu k zdrojáku alebo absolutnú pathu
+	- currency môže byť buď usd alebo eur
+	- mode je folder pre skener z folder_of_images alebo camera pre skenovanie kariet real-time
+        	- pre funkčnosť musí byť kamera dostatočne kvalitná (aspoň 720p) a treba dostatočné svetlo bez tieňov
+Ovládanie programu
+	- Pre ukončenie programu sa môže pri skenovaní v okne 'camera' stlačiť klávesu 'Esc'
+	- Posun cez okná je stlačenie klávesy 'Space' 
+	- Pri okne 'Press R to rescan' je možnosť preskenovať obrázok pri stlačení klávesy r
+Podmienky skenu
+	- Karta musí byť v semi-rovno (približne 30 stupňov do každej strany je prijateľné)
+Misc
+	- V projekte sú zahrnuté dva obrázke pre testovanie a tam sa nachádza aj default path pre fotky 
+	- API call dovoluje jemne deformované výsledky (pri nedokonalom čítaní)
+	- na konci programu sa otvorí texťák obsahujúci výsledky
+Windows-specific
+	- treba nainštalovať knižnice cez vcpkg
+Linux-specific
+	- vcpkg + mať GTK alebo QT na GUI a xdg-utils pre otvorenie texťáku
