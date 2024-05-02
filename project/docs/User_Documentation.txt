@@ -14,7 +14,26 @@ Misc
 	- V projekte sú zahrnuté dva obrázke pre testovanie a tam sa nachádza aj default path pre fotky 
 	- API call dovoluje jemne deformované výsledky (pri nedokonalom čítaní)
 	- na konci programu sa otvorí texťák obsahujúci výsledky
+
+
+Projekt potrebuje OpenCV, Tesseract a LibcURL na funkčnosť
+https://opencv.org/releases/
+https://github.com/tesseract-ocr/tesseract
+https://curl.se/libcurl/
+
 Windows-specific
 	- treba nainštalovať knižnice cez vcpkg
+		- Nainštalovať vcpkg
+			- Vytvoriť priečinok pre vcpkg (mala by fungovať akákoľvek path)
+			- Otvoriť path pre vcpkg v powershelly
+			- ```git clone https://github.com/microsoft/vcpkg.git```
+			- ```cd .\vcpkg```
+			- ```.\bootstrasp-vcpkg.bat```
+			- ```.\vcpkg integrate install```
+			- ```.\vcpkg install opencv4``` (ak nefuguje na prvý pokus, treba skúsiť ```.\vcpkg search opencv4```)
+			- ```.\vcpkg install tesseract```
+			- ```.\vcpkg install curl```
 Linux-specific
 	- vcpkg + mať GTK alebo QT na GUI a xdg-utils pre otvorenie texťáku
+		- Nainštalovať vcpkg rovnako ako pre windows po ```.\bootstrasp-vcpkg.bat```
+        	- v /src ```vcpkg install``` pre nainštalovanie knižníc z vcpkg manifestu

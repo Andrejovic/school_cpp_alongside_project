@@ -19,7 +19,7 @@ https://curl.se/libcurl/
     - ```.\vcpkg install opencv4``` (if doesnt work, search for it first with ```.\vcpkg search opencv4```)
     - ```.\vcpkg install tesseract```
     - ```.\vcpkg install curl```
-    - done, now every MSBuild C++ project should have access to OpenCV
+    - done, now every MSBuild C++ project should have access to those external libraries
 
 
 useful - https://www.youtube.com/watch?v=0h1lC3QHLHU
